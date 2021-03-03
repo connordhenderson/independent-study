@@ -1,0 +1,3616 @@
+DB2 Universal Database Version 11.5, 5622-044 (c) Copyright IBM Corp. 1991, 2017
+Licensed Material - Program Property of IBM
+IBM DATABASE 2 Explain Table Format Tool
+
+
+
+******************** EXPLAIN INSTANCE ********************
+
+DB2_VERSION:       11.05.0
+FORMATTED ON DB:   TPCDS10G
+SOURCE_NAME:       SQLC2O29
+SOURCE_SCHEMA:     NULLID  
+SOURCE_VERSION:      
+EXPLAIN_TIME:      2020-10-27-03.46.16.067572
+EXPLAIN_REQUESTER: DB2INST1
+
+Database Context:
+----------------
+	Parallelism:          None
+	CPU Speed:            4.723443e-08
+	Comm Speed:           100
+	Buffer Pool size:     132072
+	Sort Heap size:       16
+	Database Heap size:   1200
+	Lock List size:       4096
+	Maximum Lock List:    10
+	Average Applications: 1
+	Locks Available:      13107
+
+Package Context:
+---------------
+	SQL Type:           Dynamic
+	Optimization Level: 5
+	Blocking:           Block All Cursors
+	Isolation Level:    Cursor Stability
+
+
+
+---------------- STATEMENT 1  SECTION 201 ----------------
+	QUERYNO:       52
+	QUERYTAG:      CLP                 
+	Statement Type:   Select
+	Updatable:        No
+	Deletable:        No
+	Query Degree:     1
+
+Original Statement:
+------------------
+with ss as 
+  (select 
+     ca_county,
+     d_qoy,
+     d_year,
+     sum(ss_ext_sales_price) as store_sales 
+   from 
+     store_sales,
+     date_dim,
+     customer_address 
+   where 
+     ss_sold_date_sk = d_date_sk and 
+     ss_addr_sk=ca_address_sk 
+   group by 
+     ca_county,
+     d_qoy,
+     d_year
+  ),
+  ws as 
+  (select 
+     ca_county,
+     d_qoy,
+     d_year,
+     sum(ws_ext_sales_price) as web_sales 
+   from 
+     web_sales,
+     date_dim,
+     customer_address 
+   where 
+     ws_sold_date_sk = d_date_sk and 
+     ws_bill_addr_sk=ca_address_sk 
+   group by 
+     ca_county,
+     d_qoy,
+     d_year
+  ) 
+select 
+  ss1.ca_county,
+  ss1.d_year,
+  ws2.web_sales/ws1.web_sales web_q1_q2_increase,
+  ss2.store_sales/ss1.store_sales store_q1_q2_increase,
+  ws3.web_sales/ws2.web_sales web_q2_q3_increase,
+  ss3.store_sales/ss2.store_sales store_q2_q3_increase 
+from 
+  ss ss1,
+  ss ss2,
+  ss ss3,
+  ws ws1,
+  ws ws2,
+  ws ws3 
+where 
+  ss1.d_qoy = 1 and 
+  ss1.d_year = 1999 and 
+  ss1.ca_county = ss2.ca_county and 
+  ss2.d_qoy = 2 and 
+  ss2.d_year = 1999 and 
+  ss2.ca_county = ss3.ca_county and 
+  ss3.d_qoy = 3 and 
+  ss3.d_year = 1999 and 
+  ss1.ca_county = ws1.ca_county and 
+  ws1.d_qoy = 1 and 
+  ws1.d_year = 1999 and 
+  ws1.ca_county = ws2.ca_county and 
+  ws2.d_qoy = 2 and 
+  ws2.d_year = 1999 and 
+  ws1.ca_county = ws3.ca_county and 
+  ws3.d_qoy = 3 and 
+  ws3.d_year =1999 and 
+case 
+when ws1.web_sales > 0 
+then ws2.web_sales/ws1.web_sales 
+else null end > 
+case 
+when ss1.store_sales > 0 
+then ss2.store_sales/ss1.store_sales 
+else null end and 
+case 
+when ws2.web_sales > 0 
+then ws3.web_sales/ws2.web_sales 
+else null end > 
+case 
+when ss2.store_sales > 0 
+then ss3.store_sales/ss2.store_sales 
+else null end 
+order by 
+  store_q1_q2_increase
+
+
+Optimized Statement:
+-------------------
+SELECT 
+  Q21.CA_COUNTY AS "CA_COUNTY",
+  Q21.$C1 AS "D_YEAR",
+  Q21.$C2 AS "WEB_Q1_Q2_INCREASE",
+  Q21.$C3 AS "STORE_Q1_Q2_INCREASE",
+  Q21.$C4 AS "WEB_Q2_Q3_INCREASE",
+  Q21.$C5 AS "STORE_Q2_Q3_INCREASE" 
+FROM 
+  (SELECT 
+     Q8.CA_COUNTY,
+     1999,
+     (Q19.$C2 / Q18.$C2),
+     (Q9.$C2 / Q8.$C2),
+     (Q20.$C2 / Q19.$C2),
+     (Q10.$C2 / Q9.$C2) 
+   FROM 
+     (SELECT 
+        Q7.CA_COUNTY,
+        Q7.D_QOY,
+        Q7.$C2 
+      FROM 
+        (SELECT 
+           Q6.CA_COUNTY,
+           Q6.D_QOY,
+           SUM(Q6.SS_EXT_SALES_PRICE) 
+         FROM 
+           (SELECT 
+              Q3.CA_COUNTY,
+              Q4.D_QOY,
+              Q5.SS_EXT_SALES_PRICE 
+            FROM 
+              TPCDS10G.CUSTOMER_ADDRESS AS Q3,
+              TPCDS10G.DATE_DIM AS Q4,
+              TPCDS10G.STORE_SALES AS Q5 
+            WHERE 
+              (Q4.D_YEAR = 1999) AND 
+              (Q5.SS_ADDR_SK = Q3.CA_ADDRESS_SK) AND 
+              (Q5.SS_SOLD_DATE_SK = Q4.D_DATE_SK) AND 
+              Q4.D_QOY IN (2, 3, 1)
+           ) AS Q6 
+         GROUP BY 
+           Q6.D_QOY,
+           Q6.CA_COUNTY
+        ) AS Q7
+     ) AS Q8,
+     Q8 AS Q9,
+     Q8 AS Q10,
+     (SELECT 
+        Q17.CA_COUNTY,
+        Q17.D_QOY,
+        Q17.$C2 
+      FROM 
+        (SELECT 
+           Q16.CA_COUNTY,
+           Q16.D_QOY,
+           SUM(Q16.WS_EXT_SALES_PRICE) 
+         FROM 
+           (SELECT 
+              Q13.CA_COUNTY,
+              Q14.D_QOY,
+              Q15.WS_EXT_SALES_PRICE 
+            FROM 
+              TPCDS10G.CUSTOMER_ADDRESS AS Q13,
+              TPCDS10G.DATE_DIM AS Q14,
+              TPCDS10G.WEB_SALES AS Q15 
+            WHERE 
+              (Q14.D_YEAR = 1999) AND 
+              (Q15.WS_BILL_ADDR_SK = Q13.CA_ADDRESS_SK) AND 
+              (Q15.WS_SOLD_DATE_SK = Q14.D_DATE_SK) AND 
+              Q14.D_QOY IN (2, 3, 1)
+           ) AS Q16 
+         GROUP BY 
+           Q16.D_QOY,
+           Q16.CA_COUNTY
+        ) AS Q17
+     ) AS Q18,
+     Q18 AS Q19,
+     Q18 AS Q20 
+   WHERE 
+     (Q20.D_QOY = 3) AND 
+     (Q18.CA_COUNTY = Q20.CA_COUNTY) AND 
+     (Q19.D_QOY = 2) AND 
+     (Q20.CA_COUNTY = Q19.CA_COUNTY) AND 
+     (Q18.D_QOY = 1) AND 
+     (Q8.CA_COUNTY = Q20.CA_COUNTY) AND 
+     (Q10.D_QOY = 3) AND 
+     (Q20.CA_COUNTY = Q10.CA_COUNTY) AND 
+     (Q9.D_QOY = 2) AND 
+     (Q20.CA_COUNTY = Q9.CA_COUNTY) AND 
+     (Q8.D_QOY = 1) AND 
+     (
+      CASE 
+      WHEN (Q9.$C2 > 0) 
+      THEN (Q10.$C2 / Q9.$C2) 
+      ELSE NULL END < 
+      CASE 
+      WHEN (Q19.$C2 > 0) 
+      THEN (Q20.$C2 / Q19.$C2) 
+      ELSE NULL END) AND 
+     (
+      CASE 
+      WHEN (Q8.$C2 > 0) 
+      THEN (Q9.$C2 / Q8.$C2) 
+      ELSE NULL END < 
+      CASE 
+      WHEN (Q18.$C2 > 0) 
+      THEN (Q19.$C2 / Q18.$C2) 
+      ELSE NULL END)
+  ) AS Q21 
+ORDER BY 
+  Q21.$C3
+
+Access Plan:
+-----------
+	Total Cost: 		242086
+	Query Degree:		1
+
+
+                                                                                                Rows 
+                                                                                               RETURN
+                                                                                               (   1)
+                                                                                                Cost 
+                                                                                                 I/O 
+                                                                                                 |
+                                                                                                  0 
+                                                                                               TBSCAN
+                                                                                               (   2)
+                                                                                               242086 
+                                                                                               239499 
+                                                                                                 |
+                                                                                                  0 
+                                                                                               SORT  
+                                                                                               (   3)
+                                                                                               242086 
+                                                                                               239499 
+                                                                                                 |
+                                                                                                  0 
+                                                                                               ^MSJOIN
+                                                                                               (   4)
+                                                                                               242086 
+                                                                                               239499 
+                                                                               /-----------------+-----------------\
+                                                                              0                                   0.0133333 
+                                                                           ^MSJOIN                                 FILTER
+                                                                           (   5)                                  (  42)
+                                                                           161473                                  80612.7 
+                                                                           159678                                   79821 
+                                                /----------------------------+----------------------------\          |
+                                               0                                                             0        1 
+                                            ^MSJOIN                                                       FILTER   TBSCAN
+                                            (   6)                                                        (  21)   (  43)
+                                            165.329                                                       161308   80612.7 
+                                              24                                                          159654    79821 
+                                            /-+--\                                                          |        |
+                                           0        0                                                        0       25 
+                                        TBSCAN   FILTER                                                   ^MSJOIN  TEMP  
+                                        (   7)   (  19)                                                   (  22)   (  24)
+                                        82.6646  82.6646                                                  161308   80612.7 
+                                          12       12                                                     159654    79821 
+                                          |        |                                                    /---+----\
+                                           0        0                                                  1            0 
+                                        TEMP     TBSCAN                                             TBSCAN       FILTER
+                                        (   8)   (  20)                                             (  23)       (  37)
+                                        82.6631  82.6646                                            80612.7      80695.3 
+                                          12       12                                                79821        79833 
+                                          |        |                                                  |            |
+                                           0        0                                                 25            0 
+                                        GRPBY    TEMP                                               TEMP         ^MSJOIN
+                                        (   9)   (   8)                                             (  24)       (  38)
+                                        82.6626  82.6631                                            80612.7      80695.3 
+                                          12       12                                                79821        79833 
+                                          |                                                           |          /-+--\
+                                           0                                                          25        0      0.04 
+                                        TBSCAN                                                      GRPBY    TBSCAN   FILTER
+                                        (  10)                                                      (  25)   (  39)   (  40)
+                                        82.6625                                                     80612.7  82.6646  80612.7 
+                                          12                                                         79821     12      79821 
+                                          |                                                           |        |        |
+                                           0                                                          25        0        1 
+                                        SORT                                                        TBSCAN   TEMP     TBSCAN
+                                        (  11)                                                      (  26)   (   8)   (  41)
+                                        82.6625                                                     80612.7  82.6631  80612.7 
+                                          12                                                         79821     12      79821 
+                                          |                                                           |                 |
+                                           0                                                          25                25 
+                                        ^NLJOIN                                                     SORT              TEMP  
+                                        (  12)                                                      (  27)            (  24)
+                                        82.6623                                                     80612.7           80612.7 
+                                          12                                                         79821             79821 
+                     /--------------------+--------------------\                                      |
+                    0                                             1                                   25 
+                 ^NLJOIN                                       FETCH                                ^NLJOIN
+                 (  13)                                        (  17)                               (  28)
+                 68.8575                                       13.8049                              80612.7 
+                   10                                             2                                  79821 
+           /-------+--------\                               /----+----\                /--------------+--------------\
+          0                  0.04                          1          250000         25                                 1 
+       TBSCAN               FETCH                       IXSCAN    TABLE: TPCDS10G  pGRPBY                            FETCH 
+       (  14)               (  15)                      (  18)   CUSTOMER_ADDRESS  (  29)                            (  35)
+       55.0853              13.7721                     6.91919         Q3         80267.6                           13.8049 
+          8                    2                           1                        79771                               2 
+         |               /----+-----\                     |                          |                            /----+----\
+          0             1            73049              250000                     287903                        1          250000 
+ DP-TABLE: TPCDS10G  IXSCAN   DP-TABLE: TPCDS10G    INDEX: SYSIBM                  ^HSJOIN                    IXSCAN    TABLE: TPCDS10G
+     STORE_SALES     (  16)        DATE_DIM       SQL200730035816370               (  30)                     (  36)   CUSTOMER_ADDRESS
+         Q5          6.88642          Q4                  Q3                       80252.2                    6.91919         Q13
+                        1                                                           79771                        1 
+                       |                                                    /--------+---------\                |
+                      73049                                           7.19757e+06              2921.96        250000 
+                 INDEX: SYSIBM                                          TBSCAN                 ^HSJOIN    INDEX: SYSIBM  
+               SQL200730035816610                                       (  31)                 (  32)   SQL200730035816370
+                       Q4                                               79460.8                712.678          Q13
+                                                                         79115                   656 
+                                                                          |               /------+-------\
+                                                                      7.19757e+06     2921.96               3 
+                                                                  DP-TABLE: TPCDS10G  TBSCAN             TBSCAN
+                                                                       WEB_SALES      (  33)             (  34)
+                                                                          Q15         712.541          8.5022e-06 
+                                                                                        656                 0 
+                                                                                        |                  |
+                                                                                       73049                3 
+                                                                                DP-TABLE: TPCDS10G  TABFNC: SYSIBM  
+                                                                                     DATE_DIM            GENROW
+                                                                                        Q14                Q11
+
+
+Operator Symbols :
+------------------
+
+   Symbol      Description
+   ---------   ------------------------------------------
+   >JOIN     : Left outer join
+    JOIN<    : Right outer join
+   >JOIN<    : Full outer join
+   xJOIN     : Left antijoin
+    JOINx    : Right antijoin
+   ^JOIN     : Left early out
+    JOIN^    : Right early out
+
+
+Extended Diagnostic Information:
+--------------------------------
+
+Diagnostic Identifier: 	1
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "CA_COUNTY" of table "TPCDS10G".
+			"CUSTOMER_ADDRESS" has not had runstats run on it. 
+			This can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	2
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "CA_ADDRESS_SK" of table "TPCDS10G".
+			"CUSTOMER_ADDRESS" has not had runstats run on it. 
+			This can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	3
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "D_YEAR" of table "TPCDS10G"."DATE_DIM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	4
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "D_QOY" of table "TPCDS10G"."DATE_DIM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	5
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "D_DATE_SK" of table "TPCDS10G"."DATE_DIM"
+			has not had runstats run on it.  This can lead to
+			poor cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	6
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "SS_ADDR_SK" of table "TPCDS10G".
+			"STORE_SALES" has not had runstats run on it.  This
+			can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	7
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "SS_SOLD_DATE_SK" of table "TPCDS10G".
+			"STORE_SALES" has not had runstats run on it.  This
+			can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	8
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "CA_COUNTY" of table "TPCDS10G".
+			"CUSTOMER_ADDRESS" has not had runstats run on it. 
+			This can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	9
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "CA_ADDRESS_SK" of table "TPCDS10G".
+			"CUSTOMER_ADDRESS" has not had runstats run on it. 
+			This can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	10
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "D_YEAR" of table "TPCDS10G"."DATE_DIM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	11
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "D_QOY" of table "TPCDS10G"."DATE_DIM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	12
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "D_DATE_SK" of table "TPCDS10G"."DATE_DIM"
+			has not had runstats run on it.  This can lead to
+			poor cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	13
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "WS_BILL_ADDR_SK" of table "TPCDS10G".
+			"WEB_SALES" has not had runstats run on it.  This
+			can lead to poor cardinality and predicate
+			filtering estimates.
+Diagnostic Identifier: 	14
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "WS_SOLD_DATE_SK" of table "TPCDS10G".
+			"WEB_SALES" has not had runstats run on it.  This
+			can lead to poor cardinality and predicate
+			filtering estimates.
+
+Plan Details:
+-------------
+
+
+	1) RETURN: (Return Result)
+		Cumulative Total Cost: 		242086
+		Cumulative CPU Cost: 		2.21823e+10
+		Cumulative I/O Cost: 		239499
+		Cumulative Re-Total Cost: 	242086
+		Cumulative Re-CPU Cost: 	2.21823e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	242086
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		BLDLEVEL: (Build level)
+			DB2 v11.5.0.0 : s1906101300
+		HEAPUSE : (Maximum Statement Heap Usage)
+			640 Pages
+		PLANID  : (Access plan identifier)
+			bb5f1dd8b47e7f6d
+		PREPTIME: (Statement prepare time)
+			        35 milliseconds
+		SEMEVID : (Semantic environment identifier)
+			367b57ce7040de74
+		STMTHEAP: (Statement heap size)
+			2048
+		STMTID  : (Normalized statement identifier)
+			9edf8016c83c0f59
+
+		Input Streams:
+		-------------
+			56) From Operator #2
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q22.STORE_Q1_Q2_INCREASE(A)
+				+Q22.STORE_Q2_Q3_INCREASE
+				+Q22.WEB_Q2_Q3_INCREASE+Q22.WEB_Q1_Q2_INCREASE
+				+Q22.D_YEAR+Q22.CA_COUNTY
+
+
+	2) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		242086
+		Cumulative CPU Cost: 		2.21823e+10
+		Cumulative I/O Cost: 		239499
+		Cumulative Re-Total Cost: 	242086
+		Cumulative Re-CPU Cost: 	2.21823e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	242086
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			55) From Operator #3
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q21.STORE_Q1_Q2_INCREASE(A)
+				+Q21.STORE_Q2_Q3_INCREASE
+				+Q21.WEB_Q2_Q3_INCREASE+Q21.WEB_Q1_Q2_INCREASE
+				+Q21.D_YEAR+Q21.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			56) To Operator #1
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q22.STORE_Q1_Q2_INCREASE(A)
+				+Q22.STORE_Q2_Q3_INCREASE
+				+Q22.WEB_Q2_Q3_INCREASE+Q22.WEB_Q1_Q2_INCREASE
+				+Q22.D_YEAR+Q22.CA_COUNTY
+
+
+	3) SORT  : (Sort)
+		Cumulative Total Cost: 		242086
+		Cumulative CPU Cost: 		2.21823e+10
+		Cumulative I/O Cost: 		239499
+		Cumulative Re-Total Cost: 	242086
+		Cumulative Re-CPU Cost: 	2.21823e+10
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	242086
+		Estimated Bufferpool Buffers: 	6
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			FALSE
+		KEYS    : (Key cardinality)
+			0
+		NUMROWS : (Estimated number of rows)
+			1
+		ROWWIDTH: (Estimated width of rows)
+			76.000000
+		SORTKEY : (Sort Key column)
+			1: Q21.STORE_Q1_Q2_INCREASE(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			54) From Operator #4
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q21.STORE_Q2_Q3_INCREASE
+				+Q21.WEB_Q2_Q3_INCREASE
+				+Q21.STORE_Q1_Q2_INCREASE
+				+Q21.WEB_Q1_Q2_INCREASE+Q21.D_YEAR
+				+Q21.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			55) To Operator #2
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q21.STORE_Q1_Q2_INCREASE(A)
+				+Q21.STORE_Q2_Q3_INCREASE
+				+Q21.WEB_Q2_Q3_INCREASE+Q21.WEB_Q1_Q2_INCREASE
+				+Q21.D_YEAR+Q21.CA_COUNTY
+
+
+	4) MSJOIN: (Merge Scan Join)
+		Cumulative Total Cost: 		242086
+		Cumulative CPU Cost: 		2.21823e+10
+		Cumulative I/O Cost: 		239499
+		Cumulative Re-Total Cost: 	242086
+		Cumulative Re-CPU Cost: 	2.21823e+10
+		Cumulative Re-I/O Cost: 	239499
+		Cumulative First Row Cost: 	242086
+		Estimated Bufferpool Buffers: 	6
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		INNERCOL: (Inner Order Columns)
+			1: Q18.CA_COUNTY(A)
+		OUTERCOL: (Outer Order columns)
+			1: Q19.CA_COUNTY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Predicates:
+		----------
+		2) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q19.CA_COUNTY = Q18.CA_COUNTY)
+
+
+		27) Residual Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(
+			 CASE 
+			 WHEN (Q8.$C2 > 0) 
+			 THEN (Q9.$C2 / Q8.$C2) 
+			 ELSE NULL END < 
+			 CASE 
+			 WHEN (Q18.$C2 > 0) 
+			 THEN (Q19.$C2 / Q18.$C2) 
+			 ELSE NULL END)
+
+
+
+		Input Streams:
+		-------------
+			50) From Operator #5
+
+				Estimated number of rows: 	0
+				Number of columns: 		15
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q8.CA_COUNTY
+				+Q9.D_QOY+Q9.$C2+Q10.CA_COUNTY+Q10.D_QOY
+				+Q10.$C2+Q19.CA_COUNTY+Q19.D_QOY+Q19.$C2
+				+Q20.CA_COUNTY+Q20.D_QOY+Q20.$C2
+
+			53) From Operator #42
+
+				Estimated number of rows: 	0.0133333
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q18.CA_COUNTY(A)+Q18.$C2+Q18.D_QOY
+
+
+		Output Streams:
+		--------------
+			54) To Operator #3
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q21.STORE_Q2_Q3_INCREASE
+				+Q21.WEB_Q2_Q3_INCREASE
+				+Q21.STORE_Q1_Q2_INCREASE
+				+Q21.WEB_Q1_Q2_INCREASE+Q21.D_YEAR
+				+Q21.CA_COUNTY
+
+
+	5) MSJOIN: (Merge Scan Join)
+		Cumulative Total Cost: 		161473
+		Cumulative CPU Cost: 		1.47892e+10
+		Cumulative I/O Cost: 		159678
+		Cumulative Re-Total Cost: 	161473
+		Cumulative Re-CPU Cost: 	1.47892e+10
+		Cumulative Re-I/O Cost: 	159678
+		Cumulative First Row Cost: 	161473
+		Estimated Bufferpool Buffers: 	5
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		INNERCOL: (Inner Order Columns)
+			1: Q19.CA_COUNTY(A)
+		JN INPUT: (Join input leg)
+			OUTER
+		OUTERCOL: (Outer Order columns)
+			1: Q9.CA_COUNTY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Predicates:
+		----------
+		6) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q9.CA_COUNTY = Q19.CA_COUNTY)
+
+
+		26) Residual Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(
+			 CASE 
+			 WHEN (Q9.$C2 > 0) 
+			 THEN (Q10.$C2 / Q9.$C2) 
+			 ELSE NULL END < 
+			 CASE 
+			 WHEN (Q19.$C2 > 0) 
+			 THEN (Q20.$C2 / Q19.$C2) 
+			 ELSE NULL END)
+
+
+
+		Input Streams:
+		-------------
+			21) From Operator #6
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.CA_COUNTY(A)+Q9.D_QOY+Q9.$C2+Q10.CA_COUNTY
+				+Q10.D_QOY+Q10.$C2
+
+			49) From Operator #21
+
+				Estimated number of rows: 	0
+				Number of columns: 		9
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q19.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q8.CA_COUNTY
+				+Q19.D_QOY+Q19.$C2+Q20.CA_COUNTY+Q20.D_QOY
+				+Q20.$C2
+
+
+		Output Streams:
+		--------------
+			50) To Operator #4
+
+				Estimated number of rows: 	0
+				Number of columns: 		15
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q8.CA_COUNTY
+				+Q9.D_QOY+Q9.$C2+Q10.CA_COUNTY+Q10.D_QOY
+				+Q10.$C2+Q19.CA_COUNTY+Q19.D_QOY+Q19.$C2
+				+Q20.CA_COUNTY+Q20.D_QOY+Q20.$C2
+
+
+	6) MSJOIN: (Merge Scan Join)
+		Cumulative Total Cost: 		165.329
+		Cumulative CPU Cost: 		1.88906e+06
+		Cumulative I/O Cost: 		24
+		Cumulative Re-Total Cost: 	165.329
+		Cumulative Re-CPU Cost: 	1.88906e+06
+		Cumulative Re-I/O Cost: 	24
+		Cumulative First Row Cost: 	165.329
+		Estimated Bufferpool Buffers: 	2
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		INNERCOL: (Inner Order Columns)
+			1: Q10.CA_COUNTY(A)
+		JN INPUT: (Join input leg)
+			OUTER
+		OUTERCOL: (Outer Order columns)
+			1: Q9.CA_COUNTY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Predicates:
+		----------
+		11) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q10.CA_COUNTY = Q9.CA_COUNTY)
+
+
+
+		Input Streams:
+		-------------
+			17) From Operator #7
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.CA_COUNTY(A)+Q9.D_QOY+Q9.$C2
+
+			20) From Operator #19
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.CA_COUNTY(A)+Q10.D_QOY+Q10.$C2
+
+
+		Output Streams:
+		--------------
+			21) To Operator #5
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.CA_COUNTY(A)+Q9.D_QOY+Q9.$C2+Q10.CA_COUNTY
+				+Q10.D_QOY+Q10.$C2
+
+
+	7) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		82.6646
+		Cumulative CPU Cost: 		944532
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.000110292
+		Cumulative Re-CPU Cost: 	2335
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6646
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		23) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q9.D_QOY = 2)
+
+
+
+		Input Streams:
+		-------------
+			16) From Operator #8
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+
+		Output Streams:
+		--------------
+			17) To Operator #6
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q9.CA_COUNTY(A)+Q9.D_QOY+Q9.$C2
+
+
+	8) TEMP  : (Create Temporary Table)
+		Cumulative Total Cost: 		82.6631
+		Cumulative CPU Cost: 		912870
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0
+		Cumulative Re-CPU Cost: 	0
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6631
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		CSETEMP : (Temp over common sub-expression flag)
+			TRUE
+		SLOWMAT : (Slow Materialization flag)
+			TRUE
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Input Streams:
+		-------------
+			15) From Operator #9
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+
+		Output Streams:
+		--------------
+			16) To Operator #7
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+			18) To Operator #20
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+			41) To Operator #39
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+
+	9) GRPBY : (Group By)
+		Cumulative Total Cost: 		82.6626
+		Cumulative CPU Cost: 		900980
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.0350613
+		Cumulative Re-CPU Cost: 	742282
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6626
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			COMPLETE
+		GROUPBYC: (Group By columns)
+			TRUE
+		GROUPBYN: (Number of Group By columns)
+			2
+		GROUPBYR: (Group By requirement)
+			1: Q6.CA_COUNTY
+			2: Q6.D_QOY
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			14) From Operator #10
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.CA_COUNTY(A)+Q6.D_QOY(A)
+				+Q6.SS_EXT_SALES_PRICE
+
+
+		Output Streams:
+		--------------
+			15) To Operator #8
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+
+	10) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		82.6625
+		Cumulative CPU Cost: 		900730
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.0350494
+		Cumulative Re-CPU Cost: 	742032
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6625
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			13) From Operator #11
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.CA_COUNTY(A)+Q6.D_QOY(A)
+				+Q6.SS_EXT_SALES_PRICE
+
+
+		Output Streams:
+		--------------
+			14) To Operator #9
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.CA_COUNTY(A)+Q6.D_QOY(A)
+				+Q6.SS_EXT_SALES_PRICE
+
+
+	11) SORT  : (Sort)
+		Cumulative Total Cost: 		82.6625
+		Cumulative CPU Cost: 		899193
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.0349769
+		Cumulative Re-CPU Cost: 	740495
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6625
+		Estimated Bufferpool Buffers: 	12
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			FALSE
+		KEYS    : (Key cardinality)
+			0
+		NUMROWS : (Estimated number of rows)
+			1
+		ROWWIDTH: (Estimated width of rows)
+			36.000000
+		SORTKEY : (Sort Key column)
+			1: Q6.CA_COUNTY(A)
+			2: Q6.D_QOY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			12) From Operator #12
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.SS_EXT_SALES_PRICE+Q6.D_QOY+Q6.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			13) To Operator #10
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.CA_COUNTY(A)+Q6.D_QOY(A)
+				+Q6.SS_EXT_SALES_PRICE
+
+
+	12) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		82.6623
+		Cumulative CPU Cost: 		896493
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.0349769
+		Cumulative Re-CPU Cost: 	740495
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6623
+		Estimated Bufferpool Buffers: 	12
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+
+		Predicates:
+		----------
+		32) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			4e-06
+
+			Predicate Text:
+			--------------
+			(Q5.SS_ADDR_SK = Q3.CA_ADDRESS_SK)
+
+
+
+		Input Streams:
+		-------------
+			7) From Operator #13
+
+				Estimated number of rows: 	0
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_QOY+Q5.SS_EXT_SALES_PRICE+Q5.SS_ADDR_SK
+				+Q5.SS_SOLD_DATE_SK
+
+			11) From Operator #17
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.CA_ADDRESS_SK(A)+Q3.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			12) To Operator #11
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q6.SS_EXT_SALES_PRICE+Q6.D_QOY+Q6.CA_COUNTY
+
+
+	13) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		68.8575
+		Cumulative CPU Cost: 		157934
+		Cumulative I/O Cost: 		10
+		Cumulative Re-Total Cost: 	0.00208763
+		Cumulative Re-CPU Cost: 	44197.3
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	68.8575
+		Estimated Bufferpool Buffers: 	10
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+		JN INPUT: (Join input leg)
+			OUTER
+
+		Predicates:
+		----------
+		33) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1.36894e-05
+
+			Predicate Text:
+			--------------
+			(Q5.SS_SOLD_DATE_SK = Q4.D_DATE_SK)
+
+
+
+		Input Streams:
+		-------------
+			2) From Operator #14
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.SS_EXT_SALES_PRICE+Q5.SS_ADDR_SK
+				+Q5.SS_SOLD_DATE_SK
+
+			6) From Operator #15
+
+				Estimated number of rows: 	0.04
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_DATE_SK(A)+Q4.D_QOY
+
+
+		Output Streams:
+		--------------
+			7) To Operator #12
+
+				Estimated number of rows: 	0
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_QOY+Q5.SS_EXT_SALES_PRICE+Q5.SS_ADDR_SK
+				+Q5.SS_SOLD_DATE_SK
+
+
+	14) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		55.0853
+		Cumulative CPU Cost: 		112580
+		Cumulative I/O Cost: 		8
+		Cumulative Re-Total Cost: 	0.000328185
+		Cumulative Re-CPU Cost: 	6948
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	55.0853
+		Estimated Bufferpool Buffers: 	8
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		DPNUMPRT: (Number of data partitions accessed)
+			8
+		GLOBLOCK: (Global Lock intent)
+			INTENT SHARE
+		JN INPUT: (Join input leg)
+			OUTER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		OVERHEAD: (Overhead value)
+			6.724999
+		PFTCHSZ : (Prefetchsize value)
+			32
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+		XFERRATE: (Transferrate value)
+			0.160000
+
+		Input Streams:
+		-------------
+			1) From Object TPCDS10G.STORE_SALES
+
+				Estimated number of rows: 	0
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.$RID$+Q5.SS_EXT_SALES_PRICE+Q5.SS_ADDR_SK
+				+Q5.SS_SOLD_DATE_SK
+
+
+		Output Streams:
+		--------------
+			2) To Operator #13
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.SS_EXT_SALES_PRICE+Q5.SS_ADDR_SK
+				+Q5.SS_SOLD_DATE_SK
+
+
+	15) FETCH : (Fetch)
+		Cumulative Total Cost: 		13.7721
+		Cumulative CPU Cost: 		45354.3
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	13.7721
+		Cumulative Re-CPU Cost: 	44049.3
+		Cumulative Re-I/O Cost: 	2
+		Cumulative First Row Cost: 	13.7721
+		Estimated Bufferpool Buffers: 	696
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		GLOBLOCK: (Global Lock intent)
+			INTENT SHARE
+		JN INPUT: (Join input leg)
+			INNER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		OVERHEAD: (Overhead value)
+			6.725000
+		PFTCHSZ : (Prefetchsize value)
+			32
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+		XFERRATE: (Transferrate value)
+			0.160000
+
+		Predicates:
+		----------
+		31) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q4.D_YEAR = 1999)
+
+
+		34) Sargable Predicate, 
+			Comparison Operator: 		In List (IN), evaluated by binary search (list sorted at compile-time)
+			Subquery Input Required: 	No
+			Filter Factor: 			1
+
+			Predicate Text:
+			--------------
+			Q4.D_QOY IN (2, 3, 1)
+
+
+
+		Input Streams:
+		-------------
+			4) From Operator #16
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_DATE_SK(A)+Q4.$RID$
+
+			5) From Object TPCDS10G.DATE_DIM
+
+				Estimated number of rows: 	73049
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_YEAR+Q4.D_QOY
+
+
+		Output Streams:
+		--------------
+			6) To Operator #13
+
+				Estimated number of rows: 	0.04
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_DATE_SK(A)+Q4.D_QOY
+
+
+	16) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		6.88642
+		Cumulative CPU Cost: 		30165.8
+		Cumulative I/O Cost: 		1
+		Cumulative Re-Total Cost: 	6.88636
+		Cumulative Re-CPU Cost: 	28860.8
+		Cumulative Re-I/O Cost: 	1
+		Cumulative First Row Cost: 	6.88641
+		Estimated Bufferpool Buffers: 	49
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		DPNUMPRT: (Number of data partitions accessed)
+			9
+		GLOBLOCK: (Global Lock intent)
+			INTENT SHARE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+
+		Predicates:
+		----------
+		33) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1.36894e-05
+
+			Predicate Text:
+			--------------
+			(Q5.SS_SOLD_DATE_SK = Q4.D_DATE_SK)
+
+
+		33) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1.36894e-05
+
+			Predicate Text:
+			--------------
+			(Q5.SS_SOLD_DATE_SK = Q4.D_DATE_SK)
+
+
+
+		Input Streams:
+		-------------
+			3) From Object SYSIBM.SQL200730035816610
+
+				Estimated number of rows: 	73049
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_DATE_SK(A)+Q4.$RID$
+
+
+		Output Streams:
+		--------------
+			4) To Operator #15
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.D_DATE_SK(A)+Q4.$RID$
+
+
+	17) FETCH : (Fetch)
+		Cumulative Total Cost: 		13.8049
+		Cumulative CPU Cost: 		738559
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	13.8032
+		Cumulative Re-CPU Cost: 	703098
+		Cumulative Re-I/O Cost: 	2
+		Cumulative First Row Cost: 	13.8048
+		Estimated Bufferpool Buffers: 	6097
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			INNER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			9) From Operator #18
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.CA_ADDRESS_SK(A)+Q3.$RID$
+
+			10) From Object TPCDS10G.CUSTOMER_ADDRESS
+
+				Estimated number of rows: 	250000
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			11) To Operator #12
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.CA_ADDRESS_SK(A)+Q3.CA_COUNTY
+
+
+	18) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		6.91919
+		Cumulative CPU Cost: 		723739
+		Cumulative I/O Cost: 		1
+		Cumulative Re-Total Cost: 	6.91751
+		Cumulative Re-CPU Cost: 	688278
+		Cumulative Re-I/O Cost: 	1
+		Cumulative First Row Cost: 	6.91919
+		Estimated Bufferpool Buffers: 	3481
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+
+		Predicates:
+		----------
+		32) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			4e-06
+
+			Predicate Text:
+			--------------
+			(Q5.SS_ADDR_SK = Q3.CA_ADDRESS_SK)
+
+
+		32) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			4e-06
+
+			Predicate Text:
+			--------------
+			(Q5.SS_ADDR_SK = Q3.CA_ADDRESS_SK)
+
+
+
+		Input Streams:
+		-------------
+			8) From Object SYSIBM.SQL200730035816370
+
+				Estimated number of rows: 	250000
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.CA_ADDRESS_SK(A)+Q3.$RID$
+
+
+		Output Streams:
+		--------------
+			9) To Operator #17
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.CA_ADDRESS_SK(A)+Q3.$RID$
+
+
+	19) FILTER: (Filter)
+		Cumulative Total Cost: 		82.6646
+		Cumulative CPU Cost: 		944532
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.000110292
+		Cumulative Re-CPU Cost: 	2335
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6646
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		11) Residual Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q10.CA_COUNTY = Q9.CA_COUNTY)
+
+
+
+		Input Streams:
+		-------------
+			19) From Operator #20
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.CA_COUNTY(A)+Q10.D_QOY+Q10.$C2
+
+
+		Output Streams:
+		--------------
+			20) To Operator #6
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.CA_COUNTY(A)+Q10.D_QOY+Q10.$C2
+
+
+	20) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		82.6646
+		Cumulative CPU Cost: 		944532
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.000110292
+		Cumulative Re-CPU Cost: 	2335
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6646
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		21) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q10.D_QOY = 3)
+
+
+
+		Input Streams:
+		-------------
+			18) From Operator #8
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+
+		Output Streams:
+		--------------
+			19) To Operator #19
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q10.CA_COUNTY(A)+Q10.D_QOY+Q10.$C2
+
+
+	21) FILTER: (Filter)
+		Cumulative Total Cost: 		161308
+		Cumulative CPU Cost: 		1.47873e+10
+		Cumulative I/O Cost: 		159654
+		Cumulative Re-Total Cost: 	161308
+		Cumulative Re-CPU Cost: 	1.47873e+10
+		Cumulative Re-I/O Cost: 	159654
+		Cumulative First Row Cost: 	161308
+		Estimated Bufferpool Buffers: 	3
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		6) Residual Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q9.CA_COUNTY = Q19.CA_COUNTY)
+
+
+		26) Residual Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(
+			 CASE 
+			 WHEN (Q9.$C2 > 0) 
+			 THEN (Q10.$C2 / Q9.$C2) 
+			 ELSE NULL END < 
+			 CASE 
+			 WHEN (Q19.$C2 > 0) 
+			 THEN (Q20.$C2 / Q19.$C2) 
+			 ELSE NULL END)
+
+
+
+		Input Streams:
+		-------------
+			48) From Operator #22
+
+				Estimated number of rows: 	0
+				Number of columns: 		9
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q19.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q8.CA_COUNTY
+				+Q19.D_QOY+Q19.$C2+Q20.CA_COUNTY+Q20.D_QOY
+				+Q20.$C2
+
+
+		Output Streams:
+		--------------
+			49) To Operator #5
+
+				Estimated number of rows: 	0
+				Number of columns: 		9
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q19.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q8.CA_COUNTY
+				+Q19.D_QOY+Q19.$C2+Q20.CA_COUNTY+Q20.D_QOY
+				+Q20.$C2
+
+
+	22) MSJOIN: (Merge Scan Join)
+		Cumulative Total Cost: 		161308
+		Cumulative CPU Cost: 		1.47873e+10
+		Cumulative I/O Cost: 		159654
+		Cumulative Re-Total Cost: 	161308
+		Cumulative Re-CPU Cost: 	1.47873e+10
+		Cumulative Re-I/O Cost: 	159654
+		Cumulative First Row Cost: 	161308
+		Estimated Bufferpool Buffers: 	3
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		INNERCOL: (Inner Order Columns)
+			1: Q8.CA_COUNTY(A)
+		OUTERCOL: (Outer Order columns)
+			1: Q19.CA_COUNTY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Predicates:
+		----------
+		4) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q8.CA_COUNTY = Q19.CA_COUNTY)
+
+
+
+		Input Streams:
+		-------------
+			40) From Operator #23
+
+				Estimated number of rows: 	1
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q19.CA_COUNTY(A)+Q19.D_QOY+Q19.$C2
+
+			47) From Operator #37
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q20.CA_COUNTY
+				+Q20.D_QOY+Q20.$C2
+
+
+		Output Streams:
+		--------------
+			48) To Operator #21
+
+				Estimated number of rows: 	0
+				Number of columns: 		9
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q19.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q8.CA_COUNTY
+				+Q19.D_QOY+Q19.$C2+Q20.CA_COUNTY+Q20.D_QOY
+				+Q20.$C2
+
+
+	23) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39317e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	0.00339308
+		Cumulative Re-CPU Cost: 	71835
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		17) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q19.D_QOY = 2)
+
+
+
+		Input Streams:
+		-------------
+			39) From Operator #24
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+
+		Output Streams:
+		--------------
+			40) To Operator #22
+
+				Estimated number of rows: 	1
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q19.CA_COUNTY(A)+Q19.D_QOY+Q19.$C2
+
+
+	24) TEMP  : (Create Temporary Table)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39307e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	0
+		Cumulative Re-CPU Cost: 	0
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		CSETEMP : (Temp over common sub-expression flag)
+			TRUE
+		SLOWMAT : (Slow Materialization flag)
+			TRUE
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Input Streams:
+		-------------
+			38) From Operator #25
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+
+		Output Streams:
+		--------------
+			39) To Operator #23
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+			43) To Operator #41
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+			51) To Operator #43
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+
+	25) GRPBY : (Group By)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39301e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	80268.4
+		Cumulative Re-CPU Cost: 	7.39277e+09
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			FINAL
+		GROUPBYC: (Group By columns)
+			TRUE
+		GROUPBYN: (Number of Group By columns)
+			2
+		GROUPBYR: (Group By requirement)
+			1: Q16.CA_COUNTY
+			2: Q16.D_QOY
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			37) From Operator #26
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q16.CA_COUNTY(A)+Q16.D_QOY(A)+Q16.$C3
+
+
+		Output Streams:
+		--------------
+			38) To Operator #24
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+
+	26) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39301e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	80268.4
+		Cumulative Re-CPU Cost: 	7.39276e+09
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			36) From Operator #27
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q16.CA_COUNTY(A)+Q16.D_QOY(A)+Q16.$C3
+
+
+		Output Streams:
+		--------------
+			37) To Operator #25
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q16.CA_COUNTY(A)+Q16.D_QOY(A)+Q16.$C3
+
+
+	27) SORT  : (Sort)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.393e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	80268.4
+		Cumulative Re-CPU Cost: 	7.39276e+09
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	79339.8
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			FALSE
+		KEYS    : (Key cardinality)
+			25
+		NUMROWS : (Estimated number of rows)
+			25
+		ROWWIDTH: (Estimated width of rows)
+			40.000000
+		SORTKEY : (Sort Key column)
+			1: Q16.CA_COUNTY(A)
+			2: Q16.D_QOY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+		UNIQUE  : (Uniqueness required flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			35) From Operator #28
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q16.$C3+Q16.D_QOY+Q16.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			36) To Operator #26
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q16.CA_COUNTY(A)+Q16.D_QOY(A)+Q16.$C3
+
+
+	28) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39296e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	80268.4
+		Cumulative Re-CPU Cost: 	7.39276e+09
+		Cumulative Re-I/O Cost: 	79771
+		Cumulative First Row Cost: 	80281.4
+		Estimated Bufferpool Buffers: 	79339.8
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+
+		Predicates:
+		----------
+		40) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			4e-06
+
+			Predicate Text:
+			--------------
+			(Q15.WS_BILL_ADDR_SK = Q13.CA_ADDRESS_SK)
+
+
+
+		Input Streams:
+		-------------
+			30) From Operator #29
+
+				Estimated number of rows: 	25
+				Number of columns: 		5
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK+Q15.WS_BILL_ADDR_SK
+				+Q15.WS_SOLD_DATE_SK
+				+( SUM(Q15.WS_EXT_SALES_PRICE)[-->$C3])
+
+			34) From Operator #35
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q13.CA_ADDRESS_SK(A)+Q13.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			35) To Operator #27
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q16.$C3+Q16.D_QOY+Q16.CA_COUNTY
+
+
+	29) GRPBY : (Group By)
+		Cumulative Total Cost: 		80267.6
+		Cumulative CPU Cost: 		7.37535e+09
+		Cumulative I/O Cost: 		79771
+		Cumulative Re-Total Cost: 	80267.6
+		Cumulative Re-CPU Cost: 	7.37535e+09
+		Cumulative Re-I/O Cost: 	79771
+		Cumulative First Row Cost: 	80267.6
+		Estimated Bufferpool Buffers: 	79289.8
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			HASHED PARTIAL
+		GROUPBYC: (Group By columns)
+			TRUE
+		GROUPBYN: (Number of Group By columns)
+			2
+		GROUPBYR: (Group By requirement)
+			1: Q15.WS_BILL_ADDR_SK
+			2: Q14.D_QOY
+		JN INPUT: (Join input leg)
+			OUTER
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			29) From Operator #30
+
+				Estimated number of rows: 	287903
+				Number of columns: 		5
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK
+				+Q15.WS_EXT_SALES_PRICE+Q15.WS_BILL_ADDR_SK
+				+Q15.WS_SOLD_DATE_SK
+
+
+		Output Streams:
+		--------------
+			30) To Operator #28
+
+				Estimated number of rows: 	25
+				Number of columns: 		5
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK+Q15.WS_BILL_ADDR_SK
+				+Q15.WS_SOLD_DATE_SK
+				+( SUM(Q15.WS_EXT_SALES_PRICE)[-->$C3])
+
+
+	30) HSJOIN: (Hash Join)
+		Cumulative Total Cost: 		80252.2
+		Cumulative CPU Cost: 		7.05075e+09
+		Cumulative I/O Cost: 		79771
+		Cumulative Re-Total Cost: 	80252.2
+		Cumulative Re-CPU Cost: 	7.05075e+09
+		Cumulative Re-I/O Cost: 	79771
+		Cumulative First Row Cost: 	80252.2
+		Estimated Bufferpool Buffers: 	79289.8
+
+		Arguments:
+		---------
+		BITFLTR : (Hash Join Bit Filter used)
+			6144
+		EARLYOUT: (Early Out flag)
+			LEFT
+		HASHCODE: (Hash Code Size)
+			32 BIT
+		HASHTBSZ: (Number of hash table entries)
+			2922
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+		TUPBLKSZ: (Tuple Block Size (bytes))
+			4000
+
+		Predicates:
+		----------
+		41) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			1.36894e-05
+
+			Predicate Text:
+			--------------
+			(Q15.WS_SOLD_DATE_SK = Q14.D_DATE_SK)
+
+
+
+		Input Streams:
+		-------------
+			23) From Operator #31
+
+				Estimated number of rows: 	7.19757e+06
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q15.WS_EXT_SALES_PRICE+Q15.WS_BILL_ADDR_SK
+				+Q15.WS_SOLD_DATE_SK
+
+			28) From Operator #32
+
+				Estimated number of rows: 	2921.96
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK
+
+
+		Output Streams:
+		--------------
+			29) To Operator #29
+
+				Estimated number of rows: 	287903
+				Number of columns: 		5
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK
+				+Q15.WS_EXT_SALES_PRICE+Q15.WS_BILL_ADDR_SK
+				+Q15.WS_SOLD_DATE_SK
+
+
+	31) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		79460.8
+		Cumulative CPU Cost: 		5.33128e+09
+		Cumulative I/O Cost: 		79115
+		Cumulative Re-Total Cost: 	228.74
+		Cumulative Re-CPU Cost: 	4.84266e+09
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	6.88569
+		Estimated Bufferpool Buffers: 	79115
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		DPNUMPRT: (Number of data partitions accessed)
+			8
+		GLOBLOCK: (Global Lock intent)
+			INTENT SHARE
+		JN INPUT: (Join input leg)
+			OUTER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		OVERHEAD: (Overhead value)
+			6.724999
+		PFTCHSZ : (Prefetchsize value)
+			32
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+		XFERRATE: (Transferrate value)
+			0.160000
+
+		Input Streams:
+		-------------
+			22) From Object TPCDS10G.WEB_SALES
+
+				Estimated number of rows: 	7.19757e+06
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q15.$RID$+Q15.WS_EXT_SALES_PRICE
+				+Q15.WS_BILL_ADDR_SK+Q15.WS_SOLD_DATE_SK
+
+
+		Output Streams:
+		--------------
+			23) To Operator #30
+
+				Estimated number of rows: 	7.19757e+06
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q15.WS_EXT_SALES_PRICE+Q15.WS_BILL_ADDR_SK
+				+Q15.WS_SOLD_DATE_SK
+
+
+	32) HSJOIN: (Hash Join)
+		Cumulative Total Cost: 		712.678
+		Cumulative CPU Cost: 		5.22574e+07
+		Cumulative I/O Cost: 		656
+		Cumulative Re-Total Cost: 	712.678
+		Cumulative Re-CPU Cost: 	5.22574e+07
+		Cumulative Re-I/O Cost: 	656
+		Cumulative First Row Cost: 	712.678
+		Estimated Bufferpool Buffers: 	657.004
+
+		Arguments:
+		---------
+		BITFLTR : (Hash Join Bit Filter used)
+			4096
+		EARLYOUT: (Early Out flag)
+			LEFT
+		HASHCODE: (Hash Code Size)
+			24 BIT
+		HASHTBSZ: (Number of hash table entries)
+			3
+		JN INPUT: (Join input leg)
+			INNER
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+		TUPBLKSZ: (Tuple Block Size (bytes))
+			4000
+
+		Predicates:
+		----------
+		38) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(Q14.D_QOY = Q12.$C0)
+
+
+
+		Input Streams:
+		-------------
+			25) From Operator #33
+
+				Estimated number of rows: 	2921.96
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK
+
+			27) From Operator #34
+
+				Estimated number of rows: 	3
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q12.$C0
+
+
+		Output Streams:
+		--------------
+			28) To Operator #30
+
+				Estimated number of rows: 	2921.96
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK
+
+
+	33) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		712.541
+		Cumulative CPU Cost: 		4.93541e+07
+		Cumulative I/O Cost: 		656
+		Cumulative Re-Total Cost: 	2.13504
+		Cumulative Re-CPU Cost: 	4.5201e+07
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	7.11756
+		Estimated Bufferpool Buffers: 	656
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		DPNUMPRT: (Number of data partitions accessed)
+			9
+		GLOBLOCK: (Global Lock intent)
+			INTENT SHARE
+		JN INPUT: (Join input leg)
+			OUTER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		OVERHEAD: (Overhead value)
+			6.725000
+		PFTCHSZ : (Prefetchsize value)
+			32
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+		XFERRATE: (Transferrate value)
+			0.160000
+
+		Predicates:
+		----------
+		39) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q14.D_YEAR = 1999)
+
+
+
+		Input Streams:
+		-------------
+			24) From Object TPCDS10G.DATE_DIM
+
+				Estimated number of rows: 	73049
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.$RID$+Q14.D_YEAR+Q14.D_QOY+Q14.D_DATE_SK
+
+
+		Output Streams:
+		--------------
+			25) To Operator #32
+
+				Estimated number of rows: 	2921.96
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q14.D_QOY+Q14.D_DATE_SK
+
+
+	34) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		8.5022e-06
+		Cumulative CPU Cost: 		180
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	8.5022e-06
+		Cumulative Re-CPU Cost: 	180
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	4.2511e-06
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		GENRVALS: (GENROW IN List values)
+			VALUES (2, 3, 1)
+		JN INPUT: (Join input leg)
+			INNER
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Input Streams:
+		-------------
+			26) From Object SYSIBM.GENROW
+
+				Estimated number of rows: 	3
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q11.NUMB
+
+
+		Output Streams:
+		--------------
+			27) To Operator #32
+
+				Estimated number of rows: 	3
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q12.$C0
+
+
+	35) FETCH : (Fetch)
+		Cumulative Total Cost: 		13.8049
+		Cumulative CPU Cost: 		738559
+		Cumulative I/O Cost: 		2
+		Cumulative Re-Total Cost: 	13.8032
+		Cumulative Re-CPU Cost: 	703098
+		Cumulative Re-I/O Cost: 	2
+		Cumulative First Row Cost: 	13.8048
+		Estimated Bufferpool Buffers: 	6097
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			INNER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			32) From Operator #36
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q13.CA_ADDRESS_SK(A)+Q13.$RID$
+
+			33) From Object TPCDS10G.CUSTOMER_ADDRESS
+
+				Estimated number of rows: 	250000
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q13.CA_COUNTY
+
+
+		Output Streams:
+		--------------
+			34) To Operator #28
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q13.CA_ADDRESS_SK(A)+Q13.CA_COUNTY
+
+
+	36) IXSCAN: (Index Scan)
+		Cumulative Total Cost: 		6.91919
+		Cumulative CPU Cost: 		723739
+		Cumulative I/O Cost: 		1
+		Cumulative Re-Total Cost: 	6.91751
+		Cumulative Re-CPU Cost: 	688278
+		Cumulative Re-I/O Cost: 	1
+		Cumulative First Row Cost: 	6.91919
+		Estimated Bufferpool Buffers: 	3481
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			1
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL,READAHEAD
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+
+		Predicates:
+		----------
+		40) Start Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			4e-06
+
+			Predicate Text:
+			--------------
+			(Q15.WS_BILL_ADDR_SK = Q13.CA_ADDRESS_SK)
+
+
+		40) Stop Key Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			4e-06
+
+			Predicate Text:
+			--------------
+			(Q15.WS_BILL_ADDR_SK = Q13.CA_ADDRESS_SK)
+
+
+
+		Input Streams:
+		-------------
+			31) From Object SYSIBM.SQL200730035816370
+
+				Estimated number of rows: 	250000
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q13.CA_ADDRESS_SK(A)+Q13.$RID$
+
+
+		Output Streams:
+		--------------
+			32) To Operator #35
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q13.CA_ADDRESS_SK(A)+Q13.$RID$
+
+
+	37) FILTER: (Filter)
+		Cumulative Total Cost: 		80695.3
+		Cumulative CPU Cost: 		7.39411e+09
+		Cumulative I/O Cost: 		79833
+		Cumulative Re-Total Cost: 	80695.3
+		Cumulative Re-CPU Cost: 	7.39411e+09
+		Cumulative Re-I/O Cost: 	79833
+		Cumulative First Row Cost: 	80695.3
+		Estimated Bufferpool Buffers: 	2
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		4) Residual Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q8.CA_COUNTY = Q19.CA_COUNTY)
+
+
+
+		Input Streams:
+		-------------
+			46) From Operator #38
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q20.CA_COUNTY
+				+Q20.D_QOY+Q20.$C2
+
+
+		Output Streams:
+		--------------
+			47) To Operator #22
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q20.CA_COUNTY
+				+Q20.D_QOY+Q20.$C2
+
+
+	38) MSJOIN: (Merge Scan Join)
+		Cumulative Total Cost: 		80695.3
+		Cumulative CPU Cost: 		7.39411e+09
+		Cumulative I/O Cost: 		79833
+		Cumulative Re-Total Cost: 	80695.3
+		Cumulative Re-CPU Cost: 	7.39411e+09
+		Cumulative Re-I/O Cost: 	79833
+		Cumulative First Row Cost: 	80695.3
+		Estimated Bufferpool Buffers: 	2
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		INNERCOL: (Inner Order Columns)
+			1: Q20.CA_COUNTY(A)
+		OUTERCOL: (Outer Order columns)
+			1: Q8.CA_COUNTY(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+
+		Predicates:
+		----------
+		20) Predicate used in Join, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q8.CA_COUNTY = Q20.CA_COUNTY)
+
+
+
+		Input Streams:
+		-------------
+			42) From Operator #39
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY
+
+			45) From Operator #40
+
+				Estimated number of rows: 	0.04
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q20.CA_COUNTY(A)+Q20.D_QOY+Q20.$C2
+
+
+		Output Streams:
+		--------------
+			46) To Operator #37
+
+				Estimated number of rows: 	0
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY+Q20.CA_COUNTY
+				+Q20.D_QOY+Q20.$C2
+
+
+	39) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		82.6646
+		Cumulative CPU Cost: 		944532
+		Cumulative I/O Cost: 		12
+		Cumulative Re-Total Cost: 	0.000110292
+		Cumulative Re-CPU Cost: 	2335
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	82.6646
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			OUTER
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		25) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q8.D_QOY = 1)
+
+
+
+		Input Streams:
+		-------------
+			41) From Operator #8
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q7.CA_COUNTY(A)+Q7.D_QOY(A)+Q7.$C2
+
+
+		Output Streams:
+		--------------
+			42) To Operator #38
+
+				Estimated number of rows: 	0
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q8.CA_COUNTY(A)+Q8.$C2+Q8.D_QOY
+
+
+	40) FILTER: (Filter)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39317e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	0.00339308
+		Cumulative Re-CPU Cost: 	71835
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		20) Residual Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q8.CA_COUNTY = Q20.CA_COUNTY)
+
+
+
+		Input Streams:
+		-------------
+			44) From Operator #41
+
+				Estimated number of rows: 	1
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q20.CA_COUNTY(A)+Q20.D_QOY+Q20.$C2
+
+
+		Output Streams:
+		--------------
+			45) To Operator #38
+
+				Estimated number of rows: 	0.04
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q20.CA_COUNTY(A)+Q20.D_QOY+Q20.$C2
+
+
+	41) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39317e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	0.00339308
+		Cumulative Re-CPU Cost: 	71835
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		15) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q20.D_QOY = 3)
+
+
+
+		Input Streams:
+		-------------
+			43) From Operator #24
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+
+		Output Streams:
+		--------------
+			44) To Operator #40
+
+				Estimated number of rows: 	1
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q20.CA_COUNTY(A)+Q20.D_QOY+Q20.$C2
+
+
+	42) FILTER: (Filter)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39317e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	0.00339308
+		Cumulative Re-CPU Cost: 	71835
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		2) Residual Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q19.CA_COUNTY = Q18.CA_COUNTY)
+
+
+		27) Residual Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(
+			 CASE 
+			 WHEN (Q8.$C2 > 0) 
+			 THEN (Q9.$C2 / Q8.$C2) 
+			 ELSE NULL END < 
+			 CASE 
+			 WHEN (Q18.$C2 > 0) 
+			 THEN (Q19.$C2 / Q18.$C2) 
+			 ELSE NULL END)
+
+
+
+		Input Streams:
+		-------------
+			52) From Operator #43
+
+				Estimated number of rows: 	1
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q18.CA_COUNTY(A)+Q18.$C2+Q18.D_QOY
+
+
+		Output Streams:
+		--------------
+			53) To Operator #4
+
+				Estimated number of rows: 	0.0133333
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q18.CA_COUNTY(A)+Q18.$C2+Q18.D_QOY
+
+
+	43) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		80612.7
+		Cumulative CPU Cost: 		7.39317e+09
+		Cumulative I/O Cost: 		79821
+		Cumulative Re-Total Cost: 	0.00339308
+		Cumulative Re-CPU Cost: 	71835
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	80612.7
+		Estimated Bufferpool Buffers: 	1
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Predicates:
+		----------
+		19) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q18.D_QOY = 1)
+
+
+
+		Input Streams:
+		-------------
+			51) From Operator #24
+
+				Estimated number of rows: 	25
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q17.CA_COUNTY(A)+Q17.D_QOY(A)+Q17.$C2
+
+
+		Output Streams:
+		--------------
+			52) To Operator #42
+
+				Estimated number of rows: 	1
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q18.CA_COUNTY(A)+Q18.$C2+Q18.D_QOY
+
+
+Objects Used in Access Plan:
+---------------------------
+
+	Schema: TPCDS10G
+	Name: 	DATE_DIM
+	Type: 	Data Partitioned Table
+			Time of creation: 		2020-07-30-03.58.16.439445
+			Last statistics update: 	2020-08-27-16.53.14.377201
+			Number of columns: 		28
+			Number of rows: 		73049
+			Width of rows: 			44
+			Number of buffer pool pages: 	656
+			Number of data partitions: 	9
+			Distinct row values: 		No
+			Tablespace name: 		<VARIOUS>
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: TPCDS10G
+	Name: 	STORE_SALES
+	Type: 	Data Partitioned Table
+			Time of creation: 		2020-07-30-03.58.18.069415
+			Last statistics update: 	2020-08-27-16.54.03.042372
+			Number of columns: 		23
+			Number of rows: 		0
+			Width of rows: 			49
+			Number of buffer pool pages: 	8
+			Number of data partitions: 	8
+			Distinct row values: 		No
+			Tablespace name: 		<VARIOUS>
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: TPCDS10G
+	Name: 	WEB_SALES
+	Type: 	Data Partitioned Table
+			Time of creation: 		2020-07-30-03.58.17.854147
+			Last statistics update: 	2020-08-27-16.54.34.811147
+			Number of columns: 		34
+			Number of rows: 		7197566
+			Width of rows: 			49
+			Number of buffer pool pages: 	79115
+			Number of data partitions: 	8
+			Distinct row values: 		No
+			Tablespace name: 		<VARIOUS>
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: SYSIBM  
+	Name: 	SQL200730035816370
+	Type: 	Index
+			Time of creation: 		2020-07-30-03.58.16.309494
+			Last statistics update: 	2020-08-27-16.53.01.601610
+			Number of columns: 		1
+			Number of rows: 		250000
+			Width of rows: 			-1
+			Number of buffer pool pages: 	2617
+			Distinct row values: 		Yes
+			Tablespace name: 		TS_SD_SMALL_001
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Index clustering statistic: 	100.000000
+			Index leaf pages: 		3480
+			Index tree levels: 		2
+			Index full key cardinality: 	6003600
+			Index first key cardinality: 	6003600
+			Index first 2 keys cardinality: -1
+			Index first 3 keys cardinality: -1
+			Index first 4 keys cardinality: -1
+			Index sequential pages: 	3472
+			Index page density: 		50
+			Index avg sequential pages: 	434
+			Index avg gap between sequences:0
+			Index avg random pages: 	0
+			Fetch avg sequential pages: 	-1
+			Fetch avg gap between sequences:-1
+			Fetch avg random pages: 	-1
+			Index RID count: 		6003600
+			Index deleted RID count: 	0
+			Index empty leaf pages: 	0
+			Base Table Schema: 		TPCDS10G
+			Base Table Name: 		CUSTOMER_ADDRESS
+			Columns in index:
+				CA_ADDRESS_SK(A)
+			Null keys: 			Yes
+
+	Schema: SYSIBM  
+	Name: 	SQL200730035816610
+	Type: 	Index
+			Time of creation: 		2020-07-30-03.58.16.439445
+			Last statistics update: 	2020-08-27-16.53.14.377180
+			Number of columns: 		1
+			Number of rows: 		73049
+			Width of rows: 			-1
+			Number of buffer pool pages: 	656
+			Distinct row values: 		Yes
+			Tablespace name: 		TS_SD_SMALL_001
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Index clustering statistic: 	100.000000
+			Index leaf pages: 		48
+			Index tree levels: 		2
+			Index full key cardinality: 	73184
+			Index first key cardinality: 	73184
+			Index first 2 keys cardinality: -1
+			Index first 3 keys cardinality: -1
+			Index first 4 keys cardinality: -1
+			Index sequential pages: 	40
+			Index page density: 		62
+			Index avg sequential pages: 	5
+			Index avg gap between sequences:0
+			Index avg random pages: 	0
+			Fetch avg sequential pages: 	-1
+			Fetch avg gap between sequences:-1
+			Fetch avg random pages: 	-1
+			Index RID count: 		73184
+			Index deleted RID count: 	0
+			Index empty leaf pages: 	0
+			Base Table Schema: 		TPCDS10G
+			Base Table Name: 		DATE_DIM
+			Columns in index:
+				D_DATE_SK(A)
+			Null keys: 			Yes
+
+	Schema: TPCDS10G
+	Name: 	CUSTOMER_ADDRESS
+	Type: 	Table
+			Time of creation: 		2020-07-30-03.58.16.309494
+			Last statistics update: 	2020-08-27-16.53.01.601633
+			Number of columns: 		13
+			Number of rows: 		250000
+			Width of rows: 			53
+			Number of buffer pool pages: 	2617
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		TS_SD_SMALL_001
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+
+	Schema: SYSIBM  
+	Name: 	GENROW
+	Type: 	Table Function
+			Time of creation:
+			Last statistics update:
+			Number of columns: 		1
+			Number of rows: 		3
+			Width of rows: 			11
+			Number of buffer pool pages: 	-1
+			Distinct row values: 		No
+			Source for statistics: 		Single Node
+

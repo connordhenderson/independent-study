@@ -1,0 +1,876 @@
+DB2 Universal Database Version 11.5, 5622-044 (c) Copyright IBM Corp. 1991, 2017
+Licensed Material - Program Property of IBM
+IBM DATABASE 2 Explain Table Format Tool
+
+
+
+******************** EXPLAIN INSTANCE ********************
+
+DB2_VERSION:       11.05.0
+FORMATTED ON DB:   TPCDS10G
+SOURCE_NAME:       SQLC2O29
+SOURCE_SCHEMA:     NULLID  
+SOURCE_VERSION:      
+EXPLAIN_TIME:      2020-10-27-03.46.18.447033
+EXPLAIN_REQUESTER: DB2INST1
+
+Database Context:
+----------------
+	Parallelism:          None
+	CPU Speed:            4.723443e-08
+	Comm Speed:           100
+	Buffer Pool size:     132072
+	Sort Heap size:       16
+	Database Heap size:   1200
+	Lock List size:       4096
+	Maximum Lock List:    10
+	Average Applications: 1
+	Locks Available:      13107
+
+Package Context:
+---------------
+	SQL Type:           Dynamic
+	Optimization Level: 5
+	Blocking:           Block All Cursors
+	Isolation Level:    Cursor Stability
+
+
+
+---------------- STATEMENT 1  SECTION 201 ----------------
+	QUERYNO:       64
+	QUERYTAG:      CLP                 
+	Statement Type:   Select
+	Updatable:        No
+	Deletable:        No
+	Query Degree:     1
+
+Original Statement:
+------------------
+select 
+  distinct(i_product_name) 
+from 
+  item i1 
+where 
+  i_manufact_id between 679 and 679+40 and 
+  (select 
+     count(*) as item_cnt 
+   from 
+     item 
+   where 
+     (i_manufact = i1.i_manufact and 
+      ((i_category = 'Women' and 
+        (i_color = 'white' or 
+         i_color = 'chocolate') and 
+        (i_units = 'Dram' or 
+         i_units = 'Ton') and 
+        (i_size = 'petite' or 
+         i_size = 'extra large')) or 
+       (i_category = 'Women' and 
+        (i_color = 'steel' or 
+         i_color = 'lawn') and 
+        (i_units = 'Oz' or 
+         i_units = 'N/A') and 
+        (i_size = 'large' or 
+         i_size = 'small')) or 
+       (i_category = 'Men' and 
+        (i_color = 'maroon' or 
+         i_color = 'gainsboro') and 
+        (i_units = 'Tbl' or 
+         i_units = 'Unknown') and 
+        (i_size = 'economy' or 
+         i_size = 'N/A')) or 
+       (i_category = 'Men' and 
+        (i_color = 'green' or 
+         i_color = 'blush') and 
+        (i_units = 'Gram' or 
+         i_units = 'Lb') and 
+        (i_size = 'petite' or 
+         i_size = 'extra large')))) or 
+     (i_manufact = i1.i_manufact and 
+      ((i_category = 'Women' and 
+        (i_color = 'lemon' or 
+         i_color = 'blanched') and 
+        (i_units = 'Dozen' or 
+         i_units = 'Cup') and 
+        (i_size = 'petite' or 
+         i_size = 'extra large')) or 
+       (i_category = 'Women' and 
+        (i_color = 'beige' or 
+         i_color = 'medium') and 
+        (i_units = 'Pound' or 
+         i_units = 'Tsp') and 
+        (i_size = 'large' or 
+         i_size = 'small')) or 
+       (i_category = 'Men' and 
+        (i_color = 'deep' or 
+         i_color = 'indian') and 
+        (i_units = 'Bundle' or 
+         i_units = 'Pallet') and 
+        (i_size = 'economy' or 
+         i_size = 'N/A')) or 
+       (i_category = 'Men' and 
+        (i_color = 'moccasin' or 
+         i_color = 'cyan') and 
+        (i_units = 'Ounce' or 
+         i_units = 'Bunch') and 
+        (i_size = 'petite' or 
+         i_size = 'extra large'))))
+  ) > 0 
+order by 
+  i_product_name 
+fetch first 100 rows only
+
+
+Optimized Statement:
+-------------------
+SELECT 
+  DISTINCT Q4.I_PRODUCT_NAME AS "I_PRODUCT_NAME" 
+FROM 
+  (SELECT 
+     COUNT(*) 
+   FROM 
+     (SELECT 
+        $RID$ 
+      FROM 
+        TPCDS10G.ITEM AS Q1 
+      WHERE 
+        (Q1.I_MANUFACT = Q4.I_MANUFACT) AND 
+        ((((((((Q1.I_CATEGORY = 'Women ') AND 
+               ((Q1.I_COLOR = 'white ') OR 
+                (Q1.I_COLOR = 'chocolate '))) AND 
+              ((Q1.I_UNITS = 'Dram ') OR 
+               (Q1.I_UNITS = 'Ton '))) AND 
+             ((Q1.I_SIZE = 'petite ') OR 
+              (Q1.I_SIZE = 'extra large         '))) OR 
+            ((((Q1.I_CATEGORY = 'Women ') AND 
+               ((Q1.I_COLOR = 'steel ') OR 
+                (Q1.I_COLOR = 'lawn '))) AND 
+              ((Q1.I_UNITS = 'Oz ') OR 
+               (Q1.I_UNITS = 'N/A '))) AND 
+             ((Q1.I_SIZE = 'large ') OR 
+              (Q1.I_SIZE = 'small ')))) OR 
+           ((((Q1.I_CATEGORY = 'Men ') AND 
+              ((Q1.I_COLOR = 'maroon ') OR 
+               (Q1.I_COLOR = 'gainsboro '))) AND 
+             ((Q1.I_UNITS = 'Tbl ') OR 
+              (Q1.I_UNITS = 'Unknown '))) AND 
+            ((Q1.I_SIZE = 'economy ') OR 
+             (Q1.I_SIZE = 'N/A ')))) OR 
+          ((((Q1.I_CATEGORY = 'Men ') AND 
+             ((Q1.I_COLOR = 'green ') OR 
+              (Q1.I_COLOR = 'blush '))) AND 
+            ((Q1.I_UNITS = 'Gram ') OR 
+             (Q1.I_UNITS = 'Lb '))) AND 
+           ((Q1.I_SIZE = 'petite ') OR 
+            (Q1.I_SIZE = 'extra large         ')))) OR 
+         (((((((Q1.I_CATEGORY = 'Women ') AND 
+               ((Q1.I_COLOR = 'lemon ') OR 
+                (Q1.I_COLOR = 'blanched '))) AND 
+              ((Q1.I_UNITS = 'Dozen ') OR 
+               (Q1.I_UNITS = 'Cup '))) AND 
+             ((Q1.I_SIZE = 'petite ') OR 
+              (Q1.I_SIZE = 'extra large         '))) OR 
+            ((((Q1.I_CATEGORY = 'Women ') AND 
+               ((Q1.I_COLOR = 'beige ') OR 
+                (Q1.I_COLOR = 'medium '))) AND 
+              ((Q1.I_UNITS = 'Pound ') OR 
+               (Q1.I_UNITS = 'Tsp '))) AND 
+             ((Q1.I_SIZE = 'large ') OR 
+              (Q1.I_SIZE = 'small ')))) OR 
+           ((((Q1.I_CATEGORY = 'Men ') AND 
+              ((Q1.I_COLOR = 'deep ') OR 
+               (Q1.I_COLOR = 'indian '))) AND 
+             ((Q1.I_UNITS = 'Bundle ') OR 
+              (Q1.I_UNITS = 'Pallet '))) AND 
+            ((Q1.I_SIZE = 'economy ') OR 
+             (Q1.I_SIZE = 'N/A ')))) OR 
+          ((((Q1.I_CATEGORY = 'Men ') AND 
+             ((Q1.I_COLOR = 'moccasin ') OR 
+              (Q1.I_COLOR = 'cyan '))) AND 
+            ((Q1.I_UNITS = 'Ounce ') OR 
+             (Q1.I_UNITS = 'Bunch '))) AND 
+           ((Q1.I_SIZE = 'petite ') OR 
+            (Q1.I_SIZE = 'extra large         ')))))
+     ) AS Q2
+  ) AS Q3,
+  TPCDS10G.ITEM AS Q4 
+WHERE 
+  (0 < Q3.$C0) AND 
+  (Q4.I_MANUFACT_ID <= 719) AND 
+  (679 <= Q4.I_MANUFACT_ID) 
+ORDER BY 
+  Q4.I_PRODUCT_NAME
+
+Access Plan:
+-----------
+	Total Cost: 		159495
+	Query Degree:		1
+
+
+            Rows 
+           RETURN
+           (   1)
+            Cost 
+             I/O 
+             |
+             100 
+           TBSCAN
+           (   2)
+           159495 
+            6614 
+             |
+             100 
+           SORT  
+           (   3)
+           159495 
+            6614 
+             |
+            3400 
+           ^NLJOIN
+           (   4)
+           159494 
+            6614 
+         /---+----\
+      10200      0.333333 
+     TBSCAN       FILTER
+     (   5)       (   6)
+     3327.08      3329.22 
+      3307         3307 
+       |            |
+     102000          1 
+ TABLE: TPCDS10G  GRPBY 
+      ITEM        (   7)
+       Q4         3329.22 
+                   3307 
+                    |
+                 0.668419 
+                  TBSCAN
+                  (   8)
+                  3329.22 
+                   3307 
+                    |
+                  102000 
+              TABLE: TPCDS10G
+                   ITEM
+                    Q1
+
+
+Operator Symbols :
+------------------
+
+   Symbol      Description
+   ---------   ------------------------------------------
+   >JOIN     : Left outer join
+    JOIN<    : Right outer join
+   >JOIN<    : Full outer join
+   xJOIN     : Left antijoin
+    JOINx    : Right antijoin
+   ^JOIN     : Left early out
+    JOIN^    : Right early out
+
+
+Extended Diagnostic Information:
+--------------------------------
+
+Diagnostic Identifier: 	1
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_PRODUCT_NAME" of table "TPCDS10G"."ITEM"
+			has not had runstats run on it.  This can lead to
+			poor cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	2
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_MANUFACT" of table "TPCDS10G"."ITEM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	3
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_MANUFACT_ID" of table "TPCDS10G"."ITEM"
+			has not had runstats run on it.  This can lead to
+			poor cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	4
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_SIZE" of table "TPCDS10G"."ITEM" has not
+			had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	5
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_UNITS" of table "TPCDS10G"."ITEM" has not
+			had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	6
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_COLOR" of table "TPCDS10G"."ITEM" has not
+			had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	7
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_CATEGORY" of table "TPCDS10G"."ITEM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+Diagnostic Identifier: 	8
+Diagnostic Details: 	EXP0021W  Table column has no statistics.  The
+			column "I_MANUFACT" of table "TPCDS10G"."ITEM" has
+			not had runstats run on it.  This can lead to poor
+			cardinality and predicate filtering estimates.
+
+Plan Details:
+-------------
+
+
+	1) RETURN: (Return Result)
+		Cumulative Total Cost: 		159495
+		Cumulative CPU Cost: 		3.23637e+12
+		Cumulative I/O Cost: 		6614
+		Cumulative Re-Total Cost: 	152866
+		Cumulative Re-CPU Cost: 	3.23632e+12
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	159495
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		BLDLEVEL: (Build level)
+			DB2 v11.5.0.0 : s1906101300
+		HEAPUSE : (Maximum Statement Heap Usage)
+			208 Pages
+		PLANID  : (Access plan identifier)
+			b5a4e9d8b644f307
+		PREPTIME: (Statement prepare time)
+			         5 milliseconds
+		SEMEVID : (Semantic environment identifier)
+			367b57ce7040de74
+		STMTHEAP: (Statement heap size)
+			2048
+		STMTID  : (Normalized statement identifier)
+			c7520fe9358404c0
+
+		Input Streams:
+		-------------
+			9) From Operator #2
+
+				Estimated number of rows: 	100
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.I_PRODUCT_NAME(A)
+
+
+	2) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		159495
+		Cumulative CPU Cost: 		3.23637e+12
+		Cumulative I/O Cost: 		6614
+		Cumulative Re-Total Cost: 	152866
+		Cumulative Re-CPU Cost: 	3.23632e+12
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	159495
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			FALSE
+		VISIBLE : (May be included in scan sharing structures)
+			FALSE
+		WRAPPING: (Scan may start anywhere and wrap)
+			FALSE
+
+		Input Streams:
+		-------------
+			8) From Operator #3
+
+				Estimated number of rows: 	100
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.I_PRODUCT_NAME(A)
+
+
+		Output Streams:
+		--------------
+			9) To Operator #1
+
+				Estimated number of rows: 	100
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q5.I_PRODUCT_NAME(A)
+
+
+	3) SORT  : (Sort)
+		Cumulative Total Cost: 		159495
+		Cumulative CPU Cost: 		3.23637e+12
+		Cumulative I/O Cost: 		6614
+		Cumulative Re-Total Cost: 	152866
+		Cumulative Re-CPU Cost: 	3.23632e+12
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	159495
+		Estimated Bufferpool Buffers: 	6614
+
+		Arguments:
+		---------
+		DUPLWARN: (Duplicates Warning flag)
+			TRUE
+		KEYS    : (Key cardinality)
+			10
+		NUMROWS : (Estimated number of rows)
+			100
+		ROWWIDTH: (Estimated width of rows)
+			56.000000
+		SORTKEY : (Sort Key column)
+			1: Q4.I_PRODUCT_NAME(A)
+		TEMPSIZE: (Temporary Table Page Size)
+			16384
+		TRUNCSRT: (Truncated sort (for Fetch First n Rows Only))
+			TRUE
+		UNIQUE  : (Uniqueness required flag)
+			TRUE
+
+		Input Streams:
+		-------------
+			7) From Operator #4
+
+				Estimated number of rows: 	3400
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0+Q4.I_PRODUCT_NAME+Q4.I_MANUFACT
+
+
+		Output Streams:
+		--------------
+			8) To Operator #2
+
+				Estimated number of rows: 	100
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.I_PRODUCT_NAME(A)
+
+
+	4) NLJOIN: (Nested Loop Join)
+		Cumulative Total Cost: 		159494
+		Cumulative CPU Cost: 		3.23636e+12
+		Cumulative I/O Cost: 		6614
+		Cumulative Re-Total Cost: 	152866
+		Cumulative Re-CPU Cost: 	3.23632e+12
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	3367.03
+		Estimated Bufferpool Buffers: 	6614
+
+		Arguments:
+		---------
+		EARLYOUT: (Early Out flag)
+			LEFT
+		FETCHMAX: (Override for FETCH MAXPAGES)
+			IGNORE
+		ISCANMAX: (Override for ISCAN MAXPAGES)
+			IGNORE
+
+		Input Streams:
+		-------------
+			2) From Operator #5
+
+				Estimated number of rows: 	10200
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.I_PRODUCT_NAME+Q4.I_MANUFACT
+
+			6) From Operator #6
+
+				Estimated number of rows: 	0.333333
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+		Output Streams:
+		--------------
+			7) To Operator #3
+
+				Estimated number of rows: 	3400
+				Number of columns: 		3
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0+Q4.I_PRODUCT_NAME+Q4.I_MANUFACT
+
+
+	5) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		3327.08
+		Cumulative CPU Cost: 		2.92333e+08
+		Cumulative I/O Cost: 		3307
+		Cumulative Re-Total Cost: 	12.8414
+		Cumulative Re-CPU Cost: 	2.71866e+08
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	7.18047
+		Estimated Bufferpool Buffers: 	3307
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		JN INPUT: (Join input leg)
+			OUTER
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			SLOW
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Predicates:
+		----------
+		3) Sargable Predicate, 
+			Comparison Operator: 		Less Than or Equal (<=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(Q4.I_MANUFACT_ID <= 719)
+
+
+		4) Sargable Predicate, 
+			Comparison Operator: 		Less Than or Equal (<=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(679 <= Q4.I_MANUFACT_ID)
+
+
+
+		Input Streams:
+		-------------
+			1) From Object TPCDS10G.ITEM
+
+				Estimated number of rows: 	102000
+				Number of columns: 		4
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.$RID$+Q4.I_PRODUCT_NAME+Q4.I_MANUFACT
+				+Q4.I_MANUFACT_ID
+
+
+		Output Streams:
+		--------------
+			2) To Operator #4
+
+				Estimated number of rows: 	10200
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q4.I_PRODUCT_NAME+Q4.I_MANUFACT
+
+
+	6) FILTER: (Filter)
+		Cumulative Total Cost: 		3329.22
+		Cumulative CPU Cost: 		3.37727e+08
+		Cumulative I/O Cost: 		3307
+		Cumulative Re-Total Cost: 	14.9856
+		Cumulative Re-CPU Cost: 	3.1726e+08
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	3329.22
+		Estimated Bufferpool Buffers: 	3307
+
+		Arguments:
+		---------
+		JN INPUT: (Join input leg)
+			INNER
+
+		Predicates:
+		----------
+		2) Residual Predicate, 
+			Comparison Operator: 		Less Than (<)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.333333
+
+			Predicate Text:
+			--------------
+			(0 < Q3.$C0)
+
+
+
+		Input Streams:
+		-------------
+			5) From Operator #7
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+		Output Streams:
+		--------------
+			6) To Operator #4
+
+				Estimated number of rows: 	0.333333
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+	7) GRPBY : (Group By)
+		Cumulative Total Cost: 		3329.22
+		Cumulative CPU Cost: 		3.37726e+08
+		Cumulative I/O Cost: 		3307
+		Cumulative Re-Total Cost: 	14.9855
+		Cumulative Re-CPU Cost: 	3.17259e+08
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	3329.19
+		Estimated Bufferpool Buffers: 	3307
+
+		Arguments:
+		---------
+		AGGMODE : (Aggregation Mode)
+			COMPLETE
+		GROUPBYC: (Group By columns)
+			FALSE
+		GROUPBYN: (Number of Group By columns)
+			0
+		ONEFETCH: (One Fetch flag)
+			FALSE
+
+		Input Streams:
+		-------------
+			4) From Operator #8
+
+				Estimated number of rows: 	0.668419
+				Number of columns: 		0
+				Subquery predicate ID: 		Not Applicable
+
+
+		Output Streams:
+		--------------
+			5) To Operator #6
+
+				Estimated number of rows: 	1
+				Number of columns: 		1
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C0
+
+
+	8) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		3329.22
+		Cumulative CPU Cost: 		3.37726e+08
+		Cumulative I/O Cost: 		3307
+		Cumulative Re-Total Cost: 	14.9855
+		Cumulative Re-CPU Cost: 	3.17258e+08
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	3329.19
+		Estimated Bufferpool Buffers: 	3307
+
+		Arguments:
+		---------
+		CUR_COMM: (Currently Committed)
+			TRUE
+		LCKAVOID: (Lock Avoidance)
+			TRUE
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			SEQUENTIAL          
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SKIP_INS: (Skip Inserted Rows)
+			TRUE
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Predicates:
+		----------
+		5) Sargable Predicate, 
+			Comparison Operator: 		Equal (=)
+			Subquery Input Required: 	No
+			Filter Factor: 			0.04
+
+			Predicate Text:
+			--------------
+			(Q1.I_MANUFACT = Q4.I_MANUFACT)
+
+
+		6) Sargable Predicate, 
+			Comparison Operator: 		Not Applicable
+			Subquery Input Required: 	No
+			Filter Factor: 			0.000163828
+
+			Predicate Text:
+			--------------
+			((((((((Q1.I_CATEGORY = 'Women ') AND 
+			       ((Q1.I_COLOR = 'white ') OR 
+			        (Q1.I_COLOR = 'chocolate '))) AND 
+			      ((Q1.I_UNITS = 'Dram ') OR 
+			       (Q1.I_UNITS = 'Ton '))) AND 
+			     ((Q1.I_SIZE = 'petite ') OR 
+			      (Q1.I_SIZE = 'extra large         '))) OR 
+			    ((((Q1.I_CATEGORY = 'Women ') AND 
+			       ((Q1.I_COLOR = 'steel ') OR 
+			        (Q1.I_COLOR = 'lawn '))) AND 
+			      ((Q1.I_UNITS = 'Oz ') OR 
+			       (Q1.I_UNITS = 'N/A '))) AND 
+			     ((Q1.I_SIZE = 'large ') OR 
+			      (Q1.I_SIZE = 'small ')))) OR 
+			   ((((Q1.I_CATEGORY = 'Men ') AND 
+			      ((Q1.I_COLOR = 'maroon ') OR 
+			       (Q1.I_COLOR = 'gainsboro '))) AND 
+			     ((Q1.I_UNITS = 'Tbl ') OR 
+			      (Q1.I_UNITS = 'Unknown '))) AND 
+			    ((Q1.I_SIZE = 'economy ') OR 
+			     (Q1.I_SIZE = 'N/A ')))) OR 
+			  ((((Q1.I_CATEGORY = 'Men ') AND 
+			     ((Q1.I_COLOR = 'green ') OR 
+			      (Q1.I_COLOR = 'blush '))) AND 
+			    ((Q1.I_UNITS = 'Gram ') OR 
+			     (Q1.I_UNITS = 'Lb '))) AND 
+			   ((Q1.I_SIZE = 'petite ') OR 
+			    (Q1.I_SIZE = 'extra large         ')))) OR 
+			 (((((((Q1.I_CATEGORY = 'Women ') AND 
+			       ((Q1.I_COLOR = 'lemon ') OR 
+			        (Q1.I_COLOR = 'blanched '))) AND 
+			      ((Q1.I_UNITS = 'Dozen ') OR 
+			       (Q1.I_UNITS = 'Cup '))) AND 
+			     ((Q1.I_SIZE = 'petite ') OR 
+			      (Q1.I_SIZE = 'extra large         '))) OR 
+			    ((((Q1.I_CATEGORY = 'Women ') AND 
+			       ((Q1.I_COLOR = 'beige ') OR 
+			        (Q1.I_COLOR = 'medium '))) AND 
+			      ((Q1.I_UNITS = 'Pound ') OR 
+			       (Q1.I_UNITS = 'Tsp '))) AND 
+			     ((Q1.I_SIZE = 'large ') OR 
+			      (Q1.I_SIZE = 'small ')))) OR 
+			   ((((Q1.I_CATEGORY = 'Men ') AND 
+			      ((Q1.I_COLOR = 'deep ') OR 
+			       (Q1.I_COLOR = 'indian '))) AND 
+			     ((Q1.I_UNITS = 'Bundle ') OR 
+			      (Q1.I_UNITS = 'Pallet '))) AND 
+			    ((Q1.I_SIZE = 'economy ') OR 
+			     (Q1.I_SIZE = 'N/A ')))) OR 
+			  ((((Q1.I_CATEGORY = 'Men ') AND 
+			     ((Q1.I_COLOR = 'moccasin ') OR 
+			      (Q1.I_COLOR = 'cyan '))) AND 
+			    ((Q1.I_UNITS = 'Ounce ') OR 
+			     (Q1.I_UNITS = 'Bunch '))) AND 
+			   ((Q1.I_SIZE = 'petite ') OR 
+			    (Q1.I_SIZE = 'extra large         ')))))
+
+
+
+		Input Streams:
+		-------------
+			3) From Object TPCDS10G.ITEM
+
+				Estimated number of rows: 	102000
+				Number of columns: 		6
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q1.$RID$+Q1.I_SIZE+Q1.I_UNITS+Q1.I_COLOR
+				+Q1.I_CATEGORY+Q1.I_MANUFACT
+
+
+		Output Streams:
+		--------------
+			4) To Operator #7
+
+				Estimated number of rows: 	0.668419
+				Number of columns: 		0
+				Subquery predicate ID: 		Not Applicable
+
+
+Objects Used in Access Plan:
+---------------------------
+
+	Schema: TPCDS10G
+	Name: 	ITEM
+	Type: 	Table
+			Time of creation: 		2020-07-30-03.58.16.825990
+			Last statistics update: 	2020-08-27-16.53.40.924754
+			Number of columns: 		22
+			Number of rows: 		102000
+			Width of rows: 			245
+			Number of buffer pool pages: 	3307
+			Number of data partitions: 	1
+			Distinct row values: 		No
+			Tablespace name: 		TS_PD_DATA_001
+			Tablespace overhead: 		6.725000
+			Tablespace transfer rate: 	0.160000
+			Source for statistics: 		Single Node
+			Prefetch page count: 		32
+			Container extent page count: 	32
+			Table overflow record count: 	0
+			Table Active Blocks: 		-1
+			Average Row Compression Ratio: 	0
+			Percentage Rows Compressed: 	0
+			Average Compressed Row Size: 	0
+

@@ -1,0 +1,15 @@
+digraph g {
+	node [height=.1 shape=record]
+	7 [label=7]
+	STORE_SALES [label=STORE_SALES]
+	8 [label=8]
+	9 [label=9]
+	SQL200730035816860 [label=SQL200730035816860]
+	STORE [label=STORE]
+	6 -> 7
+	7 -> STORE_SALES
+	6 -> 8
+	8 -> 9
+	9 -> SQL200730035816860
+	8 -> STORE
+}

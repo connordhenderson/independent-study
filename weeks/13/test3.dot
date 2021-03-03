@@ -1,0 +1,9 @@
+digraph g {
+	node [height=.1 shape=record]
+	11 [label=11]
+	SQL200730035816610 [label=SQL200730035816610]
+	DATE_DIM [label=DATE_DIM]
+	10 -> 11
+	11 -> SQL200730035816610
+	10 -> DATE_DIM
+}

@@ -1,0 +1,217 @@
+DB2 Universal Database Version 11.5, 5622-044 (c) Copyright IBM Corp. 1991, 2017
+Licensed Material - Program Property of IBM
+IBM DATABASE 2 Explain Table Format Tool
+
+
+
+******************** EXPLAIN INSTANCE ********************
+
+DB2_VERSION:       11.05.0
+FORMATTED ON DB:   TPCDS10G
+SOURCE_NAME:       SQLC2O29
+SOURCE_SCHEMA:     NULLID  
+SOURCE_VERSION:      
+EXPLAIN_TIME:      2020-10-27-03.46.05.008689
+EXPLAIN_REQUESTER: DB2INST1
+
+Database Context:
+----------------
+	Parallelism:          None
+	CPU Speed:            4.723443e-08
+	Comm Speed:           100
+	Buffer Pool size:     132072
+	Sort Heap size:       16
+	Database Heap size:   1200
+	Lock List size:       4096
+	Maximum Lock List:    10
+	Average Applications: 1
+	Locks Available:      13107
+
+Package Context:
+---------------
+	SQL Type:           Dynamic
+	Optimization Level: 5
+	Blocking:           Block All Cursors
+	Isolation Level:    Cursor Stability
+
+
+
+---------------- STATEMENT 1  SECTION 201 ----------------
+	QUERYNO:       1
+	QUERYTAG:      CLP                 
+	Statement Type:   Select
+	Updatable:        No
+	Deletable:        No
+	Query Degree:     1
+
+Original Statement:
+------------------
+select 
+  current CLIENT_APPLNAME,
+  current CLIENT_ACCTNG 
+from 
+  sysibm.sysdummy1
+
+
+Optimized Statement:
+-------------------
+SELECT 
+  CLIENT APPLNAME,
+  CLIENT ACCTNG 
+FROM 
+  (SELECT 
+     'Y' 
+   FROM 
+     (VALUES 
+        1) AS Q1
+  ) AS Q2
+
+Access Plan:
+-----------
+	Total Cost: 		5.66813e-06
+	Query Degree:		1
+
+
+       Rows 
+      RETURN
+      (   1)
+       Cost 
+        I/O 
+        |
+         1 
+      TBSCAN
+      (   2)
+    5.66813e-06 
+         0 
+        |
+         1 
+ TABFNC: SYSIBM  
+      GENROW
+
+
+
+
+Extended Diagnostic Information:
+--------------------------------
+
+No extended Diagnostic Information for this statement.
+
+
+Plan Details:
+-------------
+
+
+	1) RETURN: (Return Result)
+		Cumulative Total Cost: 		5.66813e-06
+		Cumulative CPU Cost: 		120
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	5.66813e-06
+		Cumulative Re-CPU Cost: 	120
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	4.2511e-06
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		BLDLEVEL: (Build level)
+			DB2 v11.5.0.0 : s1906101300
+		HEAPUSE : (Maximum Statement Heap Usage)
+			96 Pages
+		PLANID  : (Access plan identifier)
+			13a69c6511250638
+		PREPTIME: (Statement prepare time)
+			        12 milliseconds
+		SEMEVID : (Semantic environment identifier)
+			0000000000000001
+		STMTHEAP: (Statement heap size)
+			2048
+		STMTID  : (Normalized statement identifier)
+			b9b75b7bd27a5ec0
+
+		Input Streams:
+		-------------
+			2) From Operator #2
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C1+Q3.$C0
+
+
+	2) TBSCAN: (Table Scan)
+		Cumulative Total Cost: 		5.66813e-06
+		Cumulative CPU Cost: 		120
+		Cumulative I/O Cost: 		0
+		Cumulative Re-Total Cost: 	5.66813e-06
+		Cumulative Re-CPU Cost: 	120
+		Cumulative Re-I/O Cost: 	0
+		Cumulative First Row Cost: 	4.2511e-06
+		Estimated Bufferpool Buffers: 	0
+
+		Arguments:
+		---------
+		MAXPAGES: (Maximum pages for prefetch)
+			ALL
+		PREFETCH: (Type of Prefetch)
+			NONE                
+		ROWLOCK : (Row Lock intent)
+			SHARE (CS/RS)
+		SCANDIR : (Scan Direction)
+			FORWARD
+		SPEED   : (Assumed speed of scan, in sharing structures)
+			FAST
+		TABLOCK : (Table Lock intent)
+			INTENT SHARE
+		TBISOLVL: (Table access Isolation Level)
+			CURSOR STABILITY
+		THROTTLE: (Scan may be throttled, for scan sharing)
+			TRUE
+		VISIBLE : (May be included in scan sharing structures)
+			TRUE
+		WRAPPING: (Scan may start anywhere and wrap)
+			TRUE
+
+		Input Streams:
+		-------------
+			1) From Object SYSIBM.GENROW
+
+				Estimated number of rows: 	1
+				Number of columns: 		0
+				Subquery predicate ID: 		Not Applicable
+
+
+		Output Streams:
+		--------------
+			2) To Operator #1
+
+				Estimated number of rows: 	1
+				Number of columns: 		2
+				Subquery predicate ID: 		Not Applicable
+
+				Column Names:
+				------------
+				+Q3.$C1+Q3.$C0
+
+
+Objects Used in Access Plan:
+---------------------------
+
+	Schema: SYSIBM  
+	Name: 	SYSDUMMY1
+	Type: 	View (reference only)
+
+	Schema: SYSIBM  
+	Name: 	GENROW
+	Type: 	Table Function
+			Time of creation:
+			Last statistics update:
+			Number of columns: 		1
+			Number of rows: 		1
+			Width of rows: 			11
+			Number of buffer pool pages: 	-1
+			Distinct row values: 		No
+			Source for statistics: 		Single Node
+
